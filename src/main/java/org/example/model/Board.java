@@ -11,13 +11,14 @@ import java.util.List;
 
 /**
  * Represents the mancala board of the game.
+ *
+ * The board consists of pits and stores. The board is only for two players.
  */
 public class Board {
 
     @Getter
     private final int[] pits;
     @Getter
-    @Setter
     private int currentPlayer;
     private final int numberOfPitsPerPlayer;
     private final int stonesPerPit;
@@ -56,6 +57,18 @@ public class Board {
      */
     public Board() {
         this(DEFAULT_NUMBER_OF_PITS_PER_PLAYER, DEFAULT_STONES_PER_PIT);
+    }
+
+    /**
+     * Sets the current player.
+     *
+     * @param newPlayer the new player
+     * @throws IllegalArgumentException if the player number is invalid
+     */
+    public void setCurrentPlayer(final int newPlayer) {
+        if (newPlayer != 1 && newPlayer != 2) {
+            throw new IllegalArgumentException(String.format("Invalid player number: %d. Available players: 1, 2", newPlayer));
+        }
     }
 
     /**

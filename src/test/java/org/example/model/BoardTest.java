@@ -165,4 +165,13 @@ class BoardTest {
         board.getPits()[board.getPits().length - 1] = 22;
         assertEquals("It's a tie!", board.determineWinner());
     }
+
+    @Test
+    void testPlayerSetting() {
+        assertThrows(IllegalArgumentException.class, () -> board.setCurrentPlayer(0));
+        assertThrows(IllegalArgumentException.class, () -> board.setCurrentPlayer(3));
+
+        assertDoesNotThrow(() -> board.setCurrentPlayer(1));
+        assertDoesNotThrow(() -> board.setCurrentPlayer(2));
+    }
 }
