@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Mancala Game</title>
+        <link rel="stylesheet" th:href="@{/styles.css}">
+    </head>
+
+    <body>
+
+        <div class="restart-button">
+            <form th:action="@{/restart}" method="post">
+                <button type="submit">Restart Game</button>
+            </form>
+        </div>
+
+
+        <div class="show-demo-button">
+            <button id="showDemoButton">Show Demo</button>
+        </div>
+
+        <div class="container">
+            <div class="current-player">
+                <h2 id="currentPlayer">Player 1's turn</h2>
+            </div>
+
+            <div class="board">
+                <div class="row">
+                    <div class="mancala left-mancala" data-index="13" th:data-stones="${board.pits[6]}">
+                        <div class="stones"></div>
+                    </div>
+
+                    <div class="pits-container">
+                        <p>Player 2</p>
+
+                        <div class="top-row">
+                            <div class="pit" th:each="i : ${#numbers.sequence(12, 7)}" th:data-index="${i}"
+                                 th:data-stones="${board.pits[i]}">
+                                <div class="stones"></div>
+                            </div>
+                        </div>
+
+                        <p>Player 1</p>
+                        <div class="bottom-row">
+                            <div class="pit" th:each="i : ${#numbers.sequence(0, 5)}" th:data-index="${i}"
+                                 th:data-stones="${board.pits[i]}">
+                                <div class="stones"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mancala right-mancala" data-index="6" th:data-stones="${board.pits[13]}">
+                        <div class="stones"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="error-message"></div>
+
+            <div th:if="${winner != null}">
+                <h2 th:text="${winner}"></h2>
+            </div>
+        </div>
+
+        <script src="/scripts/mancala.js"></script>
+    </body>
+</html>

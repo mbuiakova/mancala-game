@@ -1,0 +1,166 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f5f5f5;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    position: relative;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+.board {
+    background-color: #f5deb3;
+    width: 1000px;
+    height: 400px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 10px;
+    border: 2px solid #8b4513;
+    border-radius: 10px;
+}
+
+.row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.pits-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.top-row, .bottom-row {
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 0;
+    border-radius: 50px;
+}
+
+.top-row, .left-mancala {
+    background-color: peru;
+}
+
+.bottom-row, .right-mancala {
+    background-color: coral;
+}
+
+.pit, .mancala {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    position: relative;
+    border: 1px solid #8b4513;
+    overflow: hidden;
+}
+
+.pit {
+    width: 80px;
+    height: 80px;
+    margin: 5px;
+}
+
+.pit :hover {
+    background-color: #8b4513;
+}
+
+.mancala {
+    width: 80px;
+    height: 200px;
+    margin: 5px;
+    border-radius: 50px;
+}
+
+.stones {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+.stone {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    margin: 2px;
+    background-color: red;
+}
+
+.stone.blue {
+    background-color: blue;
+}
+
+.stone.green {
+    background-color: green;
+}
+
+.stone.yellow {
+    background-color: yellow;
+}
+
+.show-demo-button {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+}
+
+.show-demo-button button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 8px;
+}
+
+.restart-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+.restart-button button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 8px;
+}
+
+.error-message {
+    color: red;
+    font-size: 16px;
+    margin-top: 10px;
+}
+
+.current-player {
+    margin-bottom: 10px;
+}
