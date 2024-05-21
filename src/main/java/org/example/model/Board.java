@@ -8,24 +8,27 @@ import org.example.exception.GameLogicException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.IntStream;
 
 /**
  * Represents the mancala board of the game.
- *
+ * <p>
  * The board consists of pits and stores. The board is only for two players.
  */
 public class Board {
-
     @Getter
     private final int[] pits;
     @Getter
-    private int currentPlayer;
+    @Setter
+    private Player currentPlayer;
+    @Getter
     private final int numberOfPitsPerPlayer;
+    @Getter
     private final int stonesPerPit;
     /**
      * The number of players in the game.
      */
-    public static final int PLAYER_COUNT = 2;
+    public static final int PLAYER_COUNT = Player.values().length;
     private static final int DEFAULT_NUMBER_OF_PITS_PER_PLAYER = 6;
     private static final int DEFAULT_STONES_PER_PIT = 6;
 
@@ -43,7 +46,7 @@ public class Board {
         pits[numberOfPitsPerPlayer] = 0; // Player 1's store
         pits[numberOfPitsPerPlayer * PLAYER_COUNT + 1] = 0; // Player 2's store
 
-        currentPlayer = 1;
+        this.currentPlayer = Player.ONE;
         this.numberOfPitsPerPlayer = numberOfPitsPerPlayer;
         this.stonesPerPit = stonesPerPit;
     }
@@ -60,18 +63,6 @@ public class Board {
     }
 
     /**
-     * Sets the current player.
-     *
-     * @param newPlayer the new player
-     * @throws IllegalArgumentException if the player number is invalid
-     */
-    public void setCurrentPlayer(final int newPlayer) {
-        if (newPlayer != 1 && newPlayer != 2) {
-            throw new IllegalArgumentException(String.format("Invalid player number: %d. Available players: 1, 2", newPlayer));
-        }
-    }
-
-    /**
      * Checks if the pit with the given index exists.
      *
      * @param pitIndex the index of the pit
@@ -81,8 +72,28 @@ public class Board {
         return pitIndex >= 0 && pitIndex < pits.length;
     }
 
+    /**
+     * Checks if it is the correct player's turn.
+     *
+     * @param pitIndex the index of the pit
+     * @return true if it is the correct player's turn, false otherwise
+     */
     public boolean checkCorrectPlayersTurn(final int pitIndex) {
-        return (currentPlayer == 1 && pitIndex >= 0 && pitIndex < numberOfPitsPerPlayer) || (currentPlayer == 2 && pitIndex > numberOfPitsPerPlayer && pitIndex < pits.length - 1);
+        return getPlayersPitsRange(currentPlayer).anyMatch(i -> i == pitIndex);
+    }
+
+
+    /**
+     * Gets the pits of the player.
+     *
+     * @param player the player
+     * @return the pits of the player
+     */
+    public IntStream getPlayersPitsRange(final Player player) {
+        final int startIndexInclusive = player.isPlayerOne() ? 0 : numberOfPitsPerPlayer + 1;
+        final int endIndexExclusive = player.isPlayerOne() ? numberOfPitsPerPlayer : pits.length - 1;
+
+        return IntStream.range(startIndexInclusive, endIndexExclusive);
     }
 
     /**
@@ -105,12 +116,20 @@ public class Board {
         return pits[pitIndex];
     }
 
-/**
+    /**
+     * Gets the total number of stones in the board.
+     *
+     * @return the total number of stones in the board
+     */
+    public int getTotalStonesCount() {
+        return Arrays.stream(pits).sum();
+    }
+
+    /**
      * Throws a GameLogicException if the move is invalid.
      *
      * @param pitIndex the index of the pit picked to make a move
      * @return true if the move is invalid, false otherwise
-     *
      * @throws GameLogicException if the move is invalid
      */
     public void throwIfInvalidMove(final int pitIndex) {
@@ -130,7 +149,6 @@ public class Board {
      *
      * @param pickedPitIndex the index of the picked pit
      * @return the moves made.
-     *
      * @see Move
      */
     public List<Move> moveStones(final int pickedPitIndex) {
@@ -179,17 +197,38 @@ public class Board {
      * Changes the current player.
      */
     private void changeTurn() {
-        currentPlayer = (currentPlayer == 1) ? 2 : 1;
+        currentPlayer = currentPlayer.nextPlayer();
     }
 
     /**
      * Checks if the player has an extra turn.
      *
-     * @param index the index of the pit where the last stone was dropped
+     * @param stoppedPitIndex the index of the pit where the last stone was dropped
      * @return true if the player has an extra turn, false otherwise
      */
-    private boolean hasExtraTurn(int index) {
-        return (currentPlayer == 1 && index == numberOfPitsPerPlayer) || (currentPlayer == 2 && index == pits.length - 1);
+    private boolean hasExtraTurn(final int stoppedPitIndex) {
+        final var value = getPlayersPitsRange(currentPlayer).max();
+        return value.isPresent() && value.getAsInt() + 1 == stoppedPitIndex;
+    }
+
+    /**
+     * Gets the index of the store pit for the player.
+     *
+     * @param player the player
+     * @return the index of the store pit
+     */
+    public int getStoreIndexForPlayer(final Player player) {
+        return player.isPlayerOne() ? numberOfPitsPerPlayer : pits.length - 1;
+    }
+
+    /**
+     * Gets the number of stones in the store for the player.
+     *
+     * @param player the player
+     * @return the number of stones in the store
+     */
+    public int getStoredStonesCountForPlayer(final Player player) {
+        return pits[getStoreIndexForPlayer(player)];
     }
 
     /**
@@ -198,18 +237,9 @@ public class Board {
      * @return true if the game is over, false otherwise
      */
     public boolean isGameOver() {
-        boolean player1Empty = true;
-        boolean player2Empty = true;
-        for (int i = 0; i < numberOfPitsPerPlayer; i++) {
-            if (pits[i] != 0) {
-                player1Empty = false;
-            }
-        }
-        for (int i = numberOfPitsPerPlayer + 1; i < pits.length - 1; i++) {
-            if (pits[i] != 0) {
-                player2Empty = false;
-            }
-        }
+        final boolean player1Empty = getPlayersPitsRange(Player.ONE).allMatch(i -> pits[i] == 0);
+        final boolean player2Empty = getPlayersPitsRange(Player.TWO).allMatch(i -> pits[i] == 0);
+
         return player1Empty || player2Empty;
     }
 
@@ -217,28 +247,38 @@ public class Board {
      * Collects the remaining stones and puts them in the stores.
      */
     public void collectRemainingStones() {
-        for (int i = 0; i < numberOfPitsPerPlayer; i++) {
-            pits[numberOfPitsPerPlayer] += pits[i];
+        getPlayersPitsRange(Player.ONE).forEach(i -> {
+            pits[getStoreIndexForPlayer(Player.ONE)] += pits[i];
             pits[i] = 0;
-        }
-        for (int i = numberOfPitsPerPlayer + 1; i < pits.length - 1; i++) {
-            pits[pits.length - 1] += pits[i];
+        });
+
+        getPlayersPitsRange(Player.TWO).forEach(i -> {
+            pits[getStoreIndexForPlayer(Player.TWO)] += pits[i];
             pits[i] = 0;
-        }
+        });
     }
 
     /**
      * Determines the winner of the game.
      *
      * @return the winner of the game
+     * @throws GameLogicException if the game is not over
+     * @see Winner
      */
-    public String determineWinner() {
-        if (pits[numberOfPitsPerPlayer] > pits[pits.length - 1]) {
-            return "Player 1 wins!";
-        } else if (pits[pits.length - 1] > pits[numberOfPitsPerPlayer]) {
-            return "Player 2 wins!";
+    public Winner determineWinner() {
+        if (!isGameOver()) {
+            throw new GameLogicException(ErrorCode.GAME_NOT_OVER, getCurrentPlayer(), -1);
+        }
+
+        final int player1Store = getStoredStonesCountForPlayer(Player.ONE);
+        final int player2Store = getStoredStonesCountForPlayer(Player.TWO);
+
+        if (player1Store > player2Store) {
+            return new Winner.PlayerWinner(Player.ONE);
+        } else if (player2Store > player1Store) {
+            return new Winner.PlayerWinner(Player.TWO);
         } else {
-            return "It's a tie!";
+            return new Winner.Tie();
         }
     }
 }

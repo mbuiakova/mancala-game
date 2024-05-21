@@ -1,18 +1,18 @@
 package org.example.model;
 
-import jdk.jfr.StackTrace;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import java.io.Serializable;
 
 /**
  * Represents a move in the game.
  */
 @Getter
-@StackTrace
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Move {
+@EqualsAndHashCode
+public class Move implements Serializable {
     /**
      * The index of the pit to move the stones from.
      */

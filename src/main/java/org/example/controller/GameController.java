@@ -9,9 +9,7 @@ import org.example.service.GameService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * The Spring controller for the game.
@@ -27,7 +25,7 @@ public class GameController {
      *
      * @param gameService the game service
      */
-    public GameController(GameService gameService) {
+    public GameController(final GameService gameService) {
         this.gameService = gameService;
     }
 
@@ -42,7 +40,7 @@ public class GameController {
         final Board board = gameService.getBoard();
 
         model.addAttribute("board", board);
-        model.addAttribute("currentPlayer", gameService.getBoard().getCurrentPlayer());
+        model.addAttribute("currentPlayer", gameService.getBoard().getCurrentPlayer().toString());
         model.addAttribute("winner", null);
 
         return "index";
@@ -57,17 +55,19 @@ public class GameController {
      */
     @PostMapping("/move")
     @ResponseBody
-    public Map<String, Object> makeMove(@RequestParam("pit") int pit) {
-        final Map<String, Object> response = new HashMap<>();
-        response.put("currentPlayer", gameService.getBoard().getCurrentPlayer());
+    public GameControllerResponse makeMove(@RequestParam("pit") int pit) {
+        final GameControllerResponse response = new GameControllerResponse();
+
+        response.setCurrentPlayer(gameService.getBoard().getCurrentPlayer().toString());
 
         try {
             final List<Move> moves = gameService.makeMove(pit);
-            response.put("currentPlayer", gameService.getBoard().getCurrentPlayer());
-            response.put("moves", moves);
+            response.setCurrentPlayer(gameService.getBoard().getCurrentPlayer().toString());
+            response.setMoves(moves);
         } catch (GameLogicException e) {
-            response.put("error", e.getMessage());
+            response.setError(e.getMessage());
         }
+
         return response;
     }
 
@@ -78,24 +78,26 @@ public class GameController {
      */
     @PostMapping("/demo")
     @ResponseBody
-    public Map<String, Object> makeDemoMoves() {
-        final Map<String, Object> response = new HashMap<>();
-        response.put("currentPlayer", gameService.getBoard().getCurrentPlayer());
+    public GameControllerResponse makeDemoMoves() {
+        final GameControllerResponse response = new GameControllerResponse();
+
+        response.setCurrentPlayer(gameService.getBoard().getCurrentPlayer().toString());
+
         final List<Move> moves = new ArrayList<>();
 
-        while (!gameService.getBoard().isGameOver()) {
-            final int move = (int) (Math.random() * gameService.getBoard().getPits().length);
+        while (!gameService.isGameOver()) {
+            final int move = gameService.getRandomPitIndex();
 
             try {
                 moves.addAll(gameService.makeMove(move));
-                response.put("currentPlayer", gameService.getBoard().getCurrentPlayer());
+                response.setCurrentPlayer(gameService.getBoard().getCurrentPlayer().toString());
             } catch (GameLogicException e) {
                 // Ignore invalid moves, since this is a demo.
             }
         }
 
-        response.put("winner", gameService.determineWinner());
-        response.put("moves", moves);
+        response.setWinner(gameService.getWinnerString());
+        response.setMoves(moves);
 
         return response;
     }

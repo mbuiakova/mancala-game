@@ -1,7 +1,7 @@
 package org.example.exception;
 
 import lombok.Getter;
-import lombok.Setter;
+import org.example.model.Player;
 
 /**
  * Represents an exception that occurs during the game logic processing.
@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 public class GameLogicException extends RuntimeException {
     private final ErrorCode errorCode;
-    private final int currentPlayer;
+    private final Player currentPlayer;
     private final int pitIndex;
 
     /**
@@ -19,7 +19,7 @@ public class GameLogicException extends RuntimeException {
      * @param currentPlayer the current player
      * @param pitIndex     the pit index
      */
-    public GameLogicException(final ErrorCode errorCode, final int currentPlayer, final int pitIndex) {
+    public GameLogicException(final ErrorCode errorCode, final Player currentPlayer, final int pitIndex) {
         super(errorCode.getMessageTemplate(currentPlayer, pitIndex));
         this.errorCode = errorCode;
         this.currentPlayer = currentPlayer;

@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateCurrentPlayer(player) {
         const currentPlayerElement = document.getElementById('currentPlayer');
-        currentPlayerElement.textContent = `Player ${player}'s turn`;
+        currentPlayerElement.textContent = `${player}'s turn`;
     }
 
     function showError(message) {
