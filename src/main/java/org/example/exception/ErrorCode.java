@@ -2,6 +2,9 @@ package org.example.exception;
 
 import org.example.model.Player;
 
+/**
+ * Represents the error codes for the game logic.
+ */
 public enum ErrorCode {
     PIT_DOES_NOT_EXIST("Invalid move for player %d in pit %d! The pit does not exist."),
     WRONG_PLAYER_TURN("Invalid move for player %d in pit %d! Only your own pits are allowed to be picked."),
@@ -15,6 +18,13 @@ public enum ErrorCode {
         this.messageTemplate = messageTemplate;
     }
 
+    /**
+     * Gets the message template for the error code.
+     *
+     * @param currentPlayer the current player
+     * @param pitIndex     the index of the pit
+     * @return the message template
+     */
     public String getMessageTemplate(final Player currentPlayer, final int pitIndex) {
         return messageTemplate.formatted(currentPlayer.ordinal() + 1, pitIndex);
     }

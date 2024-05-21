@@ -79,9 +79,22 @@ public class Board {
      * @return true if it is the correct player's turn, false otherwise
      */
     public boolean checkCorrectPlayersTurn(final int pitIndex) {
-        return getPlayersPitsRange(currentPlayer).anyMatch(i -> i == pitIndex);
+        return getPlayersPitsIndicesRange(currentPlayer).anyMatch(i -> i == pitIndex);
     }
 
+
+    /**
+     * Gets the pits indices of the player.
+     *
+     * @param player the player
+     * @return the pits indices of the player
+     */
+    public IntStream getPlayersPitsIndicesRange(final Player player) {
+        final int startIndexInclusive = player.isPlayerOne() ? 0 : numberOfPitsPerPlayer + 1;
+        final int endIndexExclusive = player.isPlayerOne() ? numberOfPitsPerPlayer : pits.length - 1;
+
+        return IntStream.range(startIndexInclusive, endIndexExclusive);
+    }
 
     /**
      * Gets the pits of the player.
@@ -89,11 +102,8 @@ public class Board {
      * @param player the player
      * @return the pits of the player
      */
-    public IntStream getPlayersPitsRange(final Player player) {
-        final int startIndexInclusive = player.isPlayerOne() ? 0 : numberOfPitsPerPlayer + 1;
-        final int endIndexExclusive = player.isPlayerOne() ? numberOfPitsPerPlayer : pits.length - 1;
-
-        return IntStream.range(startIndexInclusive, endIndexExclusive);
+    public IntStream getPlayersPits(final Player player) {
+        return getPlayersPitsIndicesRange(player).map(i -> pits[i]);
     }
 
     /**
@@ -207,7 +217,7 @@ public class Board {
      * @return true if the player has an extra turn, false otherwise
      */
     private boolean hasExtraTurn(final int stoppedPitIndex) {
-        final var value = getPlayersPitsRange(currentPlayer).max();
+        final var value = getPlayersPitsIndicesRange(currentPlayer).max();
         return value.isPresent() && value.getAsInt() + 1 == stoppedPitIndex;
     }
 
@@ -237,8 +247,8 @@ public class Board {
      * @return true if the game is over, false otherwise
      */
     public boolean isGameOver() {
-        final boolean player1Empty = getPlayersPitsRange(Player.ONE).allMatch(i -> pits[i] == 0);
-        final boolean player2Empty = getPlayersPitsRange(Player.TWO).allMatch(i -> pits[i] == 0);
+        final boolean player1Empty = getPlayersPitsIndicesRange(Player.ONE).allMatch(i -> pits[i] == 0);
+        final boolean player2Empty = getPlayersPitsIndicesRange(Player.TWO).allMatch(i -> pits[i] == 0);
 
         return player1Empty || player2Empty;
     }
@@ -247,12 +257,12 @@ public class Board {
      * Collects the remaining stones and puts them in the stores.
      */
     public void collectRemainingStones() {
-        getPlayersPitsRange(Player.ONE).forEach(i -> {
+        getPlayersPitsIndicesRange(Player.ONE).forEach(i -> {
             pits[getStoreIndexForPlayer(Player.ONE)] += pits[i];
             pits[i] = 0;
         });
 
-        getPlayersPitsRange(Player.TWO).forEach(i -> {
+        getPlayersPitsIndicesRange(Player.TWO).forEach(i -> {
             pits[getStoreIndexForPlayer(Player.TWO)] += pits[i];
             pits[i] = 0;
         });

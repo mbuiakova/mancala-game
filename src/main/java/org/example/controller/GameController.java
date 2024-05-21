@@ -65,6 +65,7 @@ public class GameController {
             response.setCurrentPlayer(gameService.getBoard().getCurrentPlayer().toString());
             response.setMoves(moves);
         } catch (GameLogicException e) {
+            // TODO: use the exception advice to handle this.
             response.setError(e.getMessage());
         }
 
@@ -112,5 +113,4 @@ public class GameController {
         gameService.resetGame();
         return "redirect:/";
     }
-
 }

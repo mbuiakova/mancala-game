@@ -22,8 +22,8 @@ class BoardTest {
     void testInitialSetup() {
         int[] pits = board.getPits();
 ;
-        board.getPlayersPitsRange(Player.ONE).forEach(i -> assertEquals(board.getPits()[i], board.getNumberOfPitsPerPlayer()));
-        board.getPlayersPitsRange(Player.TWO).forEach(i -> assertEquals(board.getPits()[i], board.getNumberOfPitsPerPlayer()));
+        board.getPlayersPitsIndicesRange(Player.ONE).forEach(i -> assertEquals(board.getPits()[i], board.getNumberOfPitsPerPlayer()));
+        board.getPlayersPitsIndicesRange(Player.TWO).forEach(i -> assertEquals(board.getPits()[i], board.getNumberOfPitsPerPlayer()));
 
         final int playerOneStoredStonesCount = board.getStoredStonesCountForPlayer(Player.ONE);
         final int playerTwoStoredStonesCount = board.getStoredStonesCountForPlayer(Player.TWO);
@@ -119,7 +119,7 @@ class BoardTest {
 
     @Test
     void testGameOver() {
-        board.getPlayersPitsRange(Player.ONE).forEach(i -> board.getPits()[i] = 0);
+        board.getPlayersPitsIndicesRange(Player.ONE).forEach(i -> board.getPits()[i] = 0);
 
         assertTrue(board.isGameOver(), "Game should be over when one side is empty");
     }
@@ -137,7 +137,7 @@ class BoardTest {
     @Test
     void testDetermineWinner() {
         // Ensure the game is over by emptying one side
-        board.getPlayersPitsRange(Player.ONE).forEach(i -> board.getPits()[i] = 0);
+        board.getPlayersPitsIndicesRange(Player.ONE).forEach(i -> board.getPits()[i] = 0);
 
         final int playerOneStoreIndex = board.getStoreIndexForPlayer(Player.ONE);
         final int playerTwoStoreIndex = board.getStoreIndexForPlayer(Player.TWO);
